@@ -1,10 +1,9 @@
 /**
  * 
  */
-
+//reload page
 $(document).ready( function () {
-	
-	
+	$("input:checkbox").removeAttr("checked");
 	$(window).load(function(){
 		$.ajax({
 			type: "GET",
@@ -12,18 +11,19 @@ $(document).ready( function () {
 			dataType: "json",
 			success: function(data1) {
 					 $.each(data1, function() { 
-			            	var output = "<li><div class='view'>"+
+			            	var output = "<li><div class='view' id="+this.id+">"+
 						      "<input class='toggle' type='checkbox'>"+
 						      "<label>"+this.name+"</label>"+
 						      "<a class='destroy'></a>"+
 						    "</div></li>";
+			            	$("input:checkbox").removeAttr('checked');
 			            	$("ul").append(output);
 			            	$("#new-todo").val("");
 			            });		
 				}
 		});
 	});
-	
+	//enter to do list
 	$("body").on("keypress","#new-todo", function (e) {
 		if(e.which == 13){
 			
@@ -35,10 +35,10 @@ $(document).ready( function () {
 				data: {"param" : input},
 				url: "LoadDataServlet",
 				success: function(key) {	
-					console.log(key+"--------1111");
-					var output = "<li><div class='view'>"+
+					var output = "<li><div class='view' id="+key+">"+
 				      "<input class='toggle' type='checkbox'>"+
 				      "<label>"+input+"</label>"+
+				      "<a class='destroy'></a>"+
 				    "</div></li>";
 					var countItem = "<b id=count>"+key+" items</b>";
 					$("ul").append(output);
@@ -57,27 +57,67 @@ $(document).ready( function () {
           $("input:checkbox").not(this).prop("checked", this.checked);
           
         } else {
-        	$("input:checkbox").removeAttr("checked");
+        	$('input:checkbox').removeAttr('checked');
         }
 
 	});
 
+	//mark all
 	$("body").on("click","input[type=checkbox]",function(){
 		var n = $( "input:checked" ).length;
 		if($("#toggle-all").is(":checked")){
 			n=n-1;
 		}
-		var itemDel = "<b id=itemDel>Clear "+n+" conpleted</b>";
+		var itemDel = "<b id=itemDel>Clear "+n+" completed</b>";
 		$("#itemDel").remove();
 		$("#clear-completed").append(itemDel);
-	});		  
-	
-	$("body").on("change","input[type=checkbox]",function(){
-		var classParent = $(this).parent().get(0).className;
-		var nameParent = $(".toggle").closest("."+classParent);
-	    if ($(this).prop("checked")){
-	        console.log(nameParent);
-	        }
 	});
 	
+	//event delete all
+	$("body").on("click","#itemDel",function(){
+		var delAll = "true";
+		$.ajax({
+			type:"GET",
+			data:{"delAll":delAll},
+			url:"LoadDataServlet",
+			success:function(){
+				console.log("Delete all");
+				$("input:checkbox").removeAttr("checked");
+				$("li").remove();
+				$("#count").remove();
+				$("#itemDel").remove();
+				/*$.each(lstTodo, function() {
+					console.log("Delete all");
+					$("#todo-list").remove();
+					$("footer").remove();
+					$("#main").remove();
+				});*/
+
+			}
+		});
+	});
+	
+	//delete items
+	$("body").on("click",".destroy",function(){
+		var itemParent = $(this).parent();
+		var itemGParent = $(this).parent().parent();
+		var valueItem = "";
+		var item = $(itemParent).attr("id");
+		console.log("id is: "+item);
+		$.ajax({
+			type:"POST",
+			data:{"itemChoose":item,"param":valueItem},
+			url:"LoadDataServlet",
+			success:function(key){
+				var item1 = $("#"+item).parent();
+				console.log(item1);
+				$("#"+item).remove();
+				var countItem = "<b id=count>"+key+" items</b>";
+				$("#count").remove();
+				$("#todo-count").append(countItem);
+				$("#new-todo").val("");
+				$(itemGParent).remove();
+			}
+		});
+	});
 });

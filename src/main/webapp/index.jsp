@@ -4,7 +4,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Backbone.js Todos</title>
+  <title>Todo List</title>
   <link rel="stylesheet" href="todo.css"/>
   <script type="text/javascript" src="jquery.js">
   
