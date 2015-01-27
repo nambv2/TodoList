@@ -35,7 +35,7 @@ public class LoadDataServlet extends HttpServlet {
 		response.setContentType("text/plain");
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().write(json);*/
-		String delAll = request.getParameter("delAll");
+		/*String delAll = request.getParameter("delAll");
 		if(delAll == null){
 			Iterator<Todo> i = listTodo.values().iterator();
 			PrintWriter writer = response.getWriter();
@@ -61,7 +61,39 @@ public class LoadDataServlet extends HttpServlet {
 			response.setContentType("text/plain");
 			response.setCharacterEncoding("UTF-8");
 			response.getWriter().write(key);
+		}*/
+		
+		String [] deleteItem = request.getParameterValues("deleteItem[]");
+		if(request.getParameterValues("deleteItem[]") != null){
+			for(int i=0;i<deleteItem.length;i++){
+		        System.out.println("Checked include: "+deleteItem[i]);
+		        listTodo.remove(Integer.parseInt(deleteItem[i])-1);
+			}
+			key = listTodo.size();
+	        System.out.println("Size is: "+key);
+	        response.setContentType("text/plain");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().write(Integer.toString(key));
+		} else {
+			System.out.println("Checked is null");
+			Iterator<Todo> i = listTodo.values().iterator();
+			PrintWriter writer = response.getWriter();
+			 writer.print("[");
+		      
+		      while (i.hasNext()) {
+		        todoModel = i.next();
+		        response.setContentType("text/json");
+		        StringBuilder sb = new StringBuilder("{");
+		        sb.append("\"id\" : ").append(todoModel.getId()).append(",");
+		        sb.append("\"name\" :").append("\"").append(todoModel.getName()).append("\"");
+		        sb.append("}");
+		        if (i.hasNext()) sb.append(",");
+		        writer.print(sb.toString());
+		        
+		      }
+		      writer.print("]");
 		}
+		
 }
 
 	/**
@@ -86,11 +118,11 @@ public class LoadDataServlet extends HttpServlet {
 			int tam=Integer.parseInt(item)-1;
 			System.out.println("item is:"+tam);
 			listTodo.remove(tam);
-			size = listTodo.size();
+			key = listTodo.size();
 			System.out.println("key-- is:"+size);
 			response.setContentType("text/plain");
 			response.setCharacterEncoding("UTF-8");
-			response.getWriter().write(Integer.toString(size));
+			response.getWriter().write(Integer.toString(key));
 		}
 		
 	}

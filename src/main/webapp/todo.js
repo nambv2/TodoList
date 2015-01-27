@@ -74,7 +74,7 @@ $(document).ready( function () {
 	});
 	
 	//event delete all
-	$("body").on("click","#itemDel",function(){
+	/*$("body").on("click","#itemDel",function(){
 		var delAll = "true";
 		$.ajax({
 			type:"GET",
@@ -86,21 +86,50 @@ $(document).ready( function () {
 				$("li").remove();
 				$("#count").remove();
 				$("#itemDel").remove();
-				/*$.each(lstTodo, function() {
+				$.each(lstTodo, function() {
 					console.log("Delete all");
 					$("#todo-list").remove();
 					$("footer").remove();
 					$("#main").remove();
-				});*/
+				});
 
+			}
+		});
+	});*/
+	
+	$("body").on("click","#itemDel",function(){
+		var selected = [];
+		if($("#toggle-all").is(":checked")){
+			//selected = [""];
+			console.log($(this).attr("id"));
+		} else {
+			var selected = [];
+			$('input:checked').each(function() {
+				console.log("this is id:"+$(this).parent().attr('id'));
+			    selected.push($(this).parent().attr('id'));
+			});
+		}
+		$.ajax({
+			type:"GET",
+			data:{"deleteItem":selected},
+			url:"LoadDataServlet",
+			success:function(key){
+				var countItem = "<b id=count>"+key+" items</b>";
+				$("#count").remove();
+				$("#todo-count").append(countItem);
+				$("#new-todo").val("");
+				$('input:checked').each(function() {
+					var idTag = $(this).parent().attr("id");
+				    $($("#"+idTag).parent()).remove();
+				});
 			}
 		});
 	});
 	
+	
 	//delete items
 	$("body").on("click",".destroy",function(){
 		var itemParent = $(this).parent();
-		var itemGParent = $(this).parent().parent();
 		var valueItem = "";
 		var item = $(itemParent).attr("id");
 		console.log("id is: "+item);
@@ -116,7 +145,7 @@ $(document).ready( function () {
 				$("#count").remove();
 				$("#todo-count").append(countItem);
 				$("#new-todo").val("");
-				$(itemGParent).remove();
+				$(item1).remove();
 			}
 		});
 	});
