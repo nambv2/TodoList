@@ -74,56 +74,50 @@ $(document).ready( function () {
 	});
 	
 	//event delete all
-	/*$("body").on("click","#itemDel",function(){
-		var delAll = "true";
-		$.ajax({
-			type:"GET",
-			data:{"delAll":delAll},
-			url:"LoadDataServlet",
-			success:function(){
-				console.log("Delete all");
-				$("input:checkbox").removeAttr("checked");
-				$("li").remove();
-				$("#count").remove();
-				$("#itemDel").remove();
-				$.each(lstTodo, function() {
-					console.log("Delete all");
-					$("#todo-list").remove();
-					$("footer").remove();
-					$("#main").remove();
-				});
-
-			}
-		});
-	});*/
 	
 	$("body").on("click","#itemDel",function(){
 		var selected = [];
 		if($("#toggle-all").is(":checked")){
-			//selected = [""];
+			selected = ["-1"];
 			console.log($(this).attr("id"));
+			$.ajax({
+				type:"GET",
+				data:{"deleteItem":selected},
+				url:"LoadDataServlet",
+				success:function(){
+					console.log("Delete all");
+					$("input:checkbox").removeAttr("checked");
+					$("li").remove();
+					$("#count").remove();
+					$("#itemDel").remove();
+					$("#todo-list").remove();
+					$("footer").remove();
+					$("#main").remove();
+
+				}
+			});
 		} else {
 			var selected = [];
 			$('input:checked').each(function() {
 				console.log("this is id:"+$(this).parent().attr('id'));
 			    selected.push($(this).parent().attr('id'));
 			});
+			$.ajax({
+				type:"GET",
+				data:{"deleteItem":selected},
+				url:"LoadDataServlet",
+				success:function(key){
+					var countItem = "<b id=count>"+key+" items</b>";
+					$("#count").remove();
+					$("#todo-count").append(countItem);
+					$("#new-todo").val("");
+					$('input:checked').each(function() {
+						var idTag = $(this).parent().attr("id");
+					    $($("#"+idTag).parent()).remove();
+					});
+				}
+			});
 		}
-		$.ajax({
-			type:"GET",
-			data:{"deleteItem":selected},
-			url:"LoadDataServlet",
-			success:function(key){
-				var countItem = "<b id=count>"+key+" items</b>";
-				$("#count").remove();
-				$("#todo-count").append(countItem);
-				$("#new-todo").val("");
-				$('input:checked').each(function() {
-					var idTag = $(this).parent().attr("id");
-				    $($("#"+idTag).parent()).remove();
-				});
-			}
-		});
 	});
 	
 	
@@ -149,4 +143,59 @@ $(document).ready( function () {
 			}
 		});
 	});
+	
+	//Edit items
+	$(function(){
+		$("body").on("dblclick",".view",function(e){
+			//e.stopPropagation();
+			var currentEle = $(this);
+			console.log("Element is:"+$(this).html());
+			var idEdit = $(this).attr("id");
+			console.log("The parent Tag have id is"+idEdit+" is: "+$("#"+idEdit).parent());
+			$.ajax({
+				type:"POST",
+				data:{"param":"","itemChoose":"","idEdit":idEdit},
+				url:"LoadDataServlet",
+				success:function(value){
+					editable(currentEle,value,idEdit);
+				}
+			});
+			
+		});
+	});
+	function editable(currentEle,value,idEdit){
+		$(currentEle).html("<input class='edit' type = 'text' value = '"+value+"'></input>");
+		$(".edit").focus();
+		$(".edit").keyup(function(event){
+			if(event.keyCode == 13){
+				var newValue = $(".edit").val().trim();
+				$.ajax({
+					type:"POST",
+					data:{"param":"","itemChoose":"","idEdit":idEdit,"newValue":newValue},
+					url:"LoadDataServlet",
+					success:function(){
+						$(currentEle).html("<input class='toggle' type='checkbox'>"+
+								"<label>"+newValue+"</label>"+
+							      "<a class='destroy'></a>");
+					}
+				});
+			}
+		});
+		$("body").on("click",function(){
+			$(currentEle).html("<input class='edit' type = 'text' value = '"+value+"'></input>");
+			$(".edit").focus();
+			var newValue = $(".edit").val().trim();
+			$.ajax({
+				type:"POST",
+				data:{"param":"","itemChoose":"","idEdit":idEdit,"newValue":newValue},
+				url:"LoadDataServlet",
+				success:function(){
+					$(currentEle).html("<input class='toggle' type='checkbox'>"+
+							"<label>"+newValue+"</label>"+
+						      "<a class='destroy'></a>");
+				}
+			});
+		});
+		
+	}
 });

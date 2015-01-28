@@ -27,44 +27,16 @@ public class LoadDataServlet extends HttpServlet {
 	Todo todoModel;
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		/*Iterator<String> iter = listTodo.values().iterator();
-		while(iter.hasNext()) {
-			System.out.println(iter.next());
-		}
-		String json = new Gson().toJson(listTodo);
-		response.setContentType("text/plain");
-		response.setCharacterEncoding("UTF-8");
-		response.getWriter().write(json);*/
-		/*String delAll = request.getParameter("delAll");
-		if(delAll == null){
-			Iterator<Todo> i = listTodo.values().iterator();
-			PrintWriter writer = response.getWriter();
-			
-			 writer.print("[");
-		      
-		      while (i.hasNext()) {
-		        todoModel = i.next();
-		        response.setContentType("text/json");
-		        StringBuilder sb = new StringBuilder("{");
-		        sb.append("\"id\" : ").append(todoModel.getId()).append(",");
-		        sb.append("\"name\" :").append("\"").append(todoModel.getName()).append("\"");
-		        sb.append("}");
-		        if (i.hasNext()) sb.append(",");
-		        writer.print(sb.toString());
-		        
-		      }
-		      
-		      writer.print("]");
-		} else {
-			listTodo.clear();
-			key = 0;
-			response.setContentType("text/plain");
-			response.setCharacterEncoding("UTF-8");
-			response.getWriter().write(key);
-		}*/
 		
 		String [] deleteItem = request.getParameterValues("deleteItem[]");
 		if(request.getParameterValues("deleteItem[]") != null){
+			if((deleteItem.length == 1) && (Integer.parseInt(deleteItem[0]) == -1)){
+				listTodo.clear();
+				key = 0;
+				/*response.setContentType("text/plain");
+				response.setCharacterEncoding("UTF-8");
+				response.getWriter().write(key);*/
+			}
 			for(int i=0;i<deleteItem.length;i++){
 		        System.out.println("Checked include: "+deleteItem[i]);
 		        listTodo.remove(Integer.parseInt(deleteItem[i])-1);
@@ -104,8 +76,11 @@ public class LoadDataServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		String outputParam =request.getParameter("param");
 		String item = request.getParameter("itemChoose");
+		String itemEdit = request.getParameter("idEdit");
+		String newValue = request.getParameter("newValue");
 		todoModel = new Todo();
-		if((outputParam.trim()!=null)&&(outputParam.trim()!="")&&(item==null)){
+		if((outputParam.trim()!=null)&&(outputParam.trim()!="")&&((item==null)||(item.trim() == ""))){
+			System.out.println("Enter list to do");
 			todoModel.setId(key+1);
 			todoModel.setName(outputParam);
 			listTodo.put(key,todoModel);
@@ -114,7 +89,9 @@ public class LoadDataServlet extends HttpServlet {
 			response.setCharacterEncoding("UTF-8");
 			response.getWriter().write(Integer.toString(key));
 		}
-		if(item!=null){
+		if((item!=null)&&(itemEdit==null)){
+			System.out.println("Item is inside :"+item+" "+item.length());
+			System.out.println("Delete item");
 			int tam=Integer.parseInt(item)-1;
 			System.out.println("item is:"+tam);
 			listTodo.remove(tam);
@@ -123,6 +100,22 @@ public class LoadDataServlet extends HttpServlet {
 			response.setContentType("text/plain");
 			response.setCharacterEncoding("UTF-8");
 			response.getWriter().write(Integer.toString(key));
+		}
+		if(itemEdit != null){
+			System.out.println("Edit item");
+			int tam=Integer.parseInt(itemEdit);
+			String value = listTodo.get(tam-1).getName();
+			response.setContentType("text/plain");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().write(value);
+			System.out.println("Value of item will be edit is:"+value);
+		}
+		if(newValue!=null){
+			System.out.println("I'm here");
+			int tam = Integer.parseInt(itemEdit);
+			todoModel.setId(tam);
+			todoModel.setName(newValue);
+			listTodo.put(tam-1, todoModel);
 		}
 		
 	}
