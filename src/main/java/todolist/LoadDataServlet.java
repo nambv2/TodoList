@@ -117,6 +117,5 @@ public class LoadDataServlet extends HttpServlet {
 			todoModel.setName(newValue);
 			listTodo.put(tam-1, todoModel);
 		}
-		System.out.println("hello");
 	}
 }
