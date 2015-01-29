@@ -181,7 +181,7 @@ $(document).ready( function () {
 				});
 			}
 		});
-		$("body").on("click",function(){
+		$("body").on("click",".view",function(){
 			$(currentEle).html("<input class='edit' type = 'text' value = '"+value+"'></input>");
 			$(".edit").focus();
 			var newValue = $(".edit").val().trim();
