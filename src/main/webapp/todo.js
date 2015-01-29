@@ -5,22 +5,23 @@
 $(document).ready( function () {
 	$("input:checkbox").removeAttr("checked");
 	$(window).load(function(){
+	
 		$.ajax({
-			type: "GET",
-			url: "LoadDataServlet",
-			dataType: "json",
-			success: function(data1) {
-					 $.each(data1, function() { 
-			            	var output = "<li><div class='view' id="+this.id+">"+
-						      "<input class='toggle' type='checkbox'>"+
-						      "<label>"+this.name+"</label>"+
-						      "<a class='destroy'></a>"+
-						    "</div></li>";
-			            	$("input:checkbox").removeAttr('checked');
-			            	$("ul").append(output);
-			            	$("#new-todo").val("");
-			            });		
-				}
+			type:"GET",
+			url:"LoadDataServlet",
+			dataType:"json",
+			success:function(lstTodo){
+				$.each(lstTodo,function(key,object){
+					var output = "<li><div class='view' id="+object.id+">"+
+				      "<input class='toggle' type='checkbox'>"+
+				      "<label>"+object.name+"</label>"+
+				      "<a class='destroy'></a>"+
+				    "</div></li>";
+					$("input:checkbox").removeAttr('checked');
+	            	$("ul").append(output);
+	            	$("#new-todo").val("");
+				});
+			}
 		});
 	});
 	//enter to do list

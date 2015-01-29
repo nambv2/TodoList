@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import model.Todo;
 
 import org.eclipse.jetty.util.Trie;
+
+import com.google.gson.Gson;
 /**
  * Servlet implementation class LoadDataServlet
  */
@@ -48,7 +50,7 @@ public class LoadDataServlet extends HttpServlet {
 			response.getWriter().write(Integer.toString(key));
 		} else {
 			System.out.println("Checked is null");
-			Iterator<Todo> i = listTodo.values().iterator();
+			/*Iterator<Todo> i = listTodo.values().iterator();
 			PrintWriter writer = response.getWriter();
 			 writer.print("[");
 		      
@@ -63,7 +65,11 @@ public class LoadDataServlet extends HttpServlet {
 		        writer.print(sb.toString());
 		        
 		      }
-		      writer.print("]");
+		      writer.print("]");*/
+			String json = new Gson().toJson(listTodo.values());
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().write(json);
 		}
 		
 }
